@@ -1,48 +1,10 @@
-# Alt 92.1 Web Scraper
-
-# import datetime
-import datetime
-
-import pandas as pd
-import requests
-import time
-from bs4 import BeautifulSoup
-
-
-def print_current_song(_df):
-    xml = requests.get(url).content
-    soup = BeautifulSoup(xml, 'xml')
-
-    artist = soup.find('artist').text
-    title = soup.find('title').text
-    start_time = soup.find('programStartTS').text
-
-    prev_entry = _df['startTime'].str.contains(start_time).any()
-    #print(str(datetime.datetime.now()) + ' -> ' + artist.ljust(25) + ' - \t' + title.ljust(25) + '\t\t\tstarted at ' + start_time)
-    #print(prev_entry)
-
-    if ~prev_entry:
-        data = pd.DataFrame({'artist': [artist], 'title': [title], 'startTime': [start_time]})
-        return pd.DataFrame(data)
-    #else:
-        #print('duplicate entry')
-
+import scraper.alt921_scraper as alt921
+import spotify.playlist_gen as plg
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    url = 'https://streamdb6web.securenetsystems.net/player_status_update/ALT921.xml'
-    cols = {'artist': pd.Series(dtype='str'), 'title': pd.Series(dtype='str'), 'startTime': pd.Series(dtype='str')}
-    df = pd.DataFrame(columns=cols)
-    today = datetime.date.today()
-    count = 0
+    # poll the radio station!
+    #alt921.alt921_scraper()
 
-    # run for a full day (24 hrs / 100 second poll)
-    while count < 864:
-        df = pd.concat([df, print_current_song(df)], ignore_index=True)
-        count += 1
-        print(df)
-        if count % 10 == 0:
-            df.to_csv('songs-' + str(today) + '.csv', index=False)
-        time.sleep(100)
-
-    df.to_csv('songs-' + str(today) + '.csv', index=False)
+    # make a playlist!
+    plg.update_playlist("5tBUVqWCyXaSez2b4DolCi", "songs-2022-09-08.csv")
